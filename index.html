@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- viewport обязателен для mobile first: без него телефон рисует страницу
+         как десктоп шириной ~980px и медиа-запросы не работают -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registan Travel — Small-group tours of Uzbekistan</title>
+    <meta name="description" content="Small-group tours of Tashkent, Samarkand and Khiva with local guides.">
+    <!-- Один общий файл стилей для index.html и booking.html.
+         Ни одного inline-стиля и встроенного блока стилей — всё в css/style.css -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Тема подключается в head (до отрисовки), чтобы тёмная тема не «моргала» -->
+    <script src="js/theme.js"></script>
+</head>
+<body>
+
+    <!-- ===================== ШАПКА =====================
+         «Жидкое стекло»: position: fixed + flexbox — логотип слева, меню справа.
+         -->
+    <header class="site-header">
+        <div class="container">
+            <a class="logo" href="index.html">
+                <!-- знак-арка рисуется в CSS, для скринридера он не нужен -->
+                <span class="logo-mark" aria-hidden="true"></span>
+                <!-- текст логотипа в отдельном span: иначе gap флексбокса
+                     встанет и между словами «Registan» и «Travel» -->
+                <span class="logo-word">Registan <span class="logo-accent">Travel</span></span>
+            </a>
+
+
+            <nav class="main-nav" aria-label="Main menu">
+                <ul>
+                    <!-- class="active" — текущая страница (золотая линия снизу) -->
+                    <li><a class="active" href="index.html" aria-current="page">Home</a></li>
+                    <li><a href="booking.html">Booking</a></li>
+                </ul>
+            </nav>
+
+            <!-- Кнопка «день / ночь»: иконка-солнце превращается в месяц -->
+            <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to night">
+                <svg class="theme-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <g class="icon-sun">
+                        <circle cx="12" cy="12" r="4"/>
+                        <path d="M12 2.8v2.1M12 19.1v2.1M2.8 12h2.1M19.1 12h2.1M5.5 5.5l1.5 1.5M17 17l1.5 1.5M5.5 18.5L7 17M17 7l1.5-1.5"/>
+                    </g>
+                    <path class="icon-moon" d="M19.5 14.6A7.6 7.6 0 0 1 9.4 4.5a7.6 7.6 0 1 0 10.1 10.1z"/>
+                </svg>
+            </button>
+
+            <!-- Видна только с 768px (на телефоне не помещается) -->
+            <a class="btn btn-gold header-cta" href="booking.html">Book now</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- ===================== HERO =====================
+             id="hero" — тот самый ID-селектор из задания.
+             Внутри арки — 3D-площадь Регистан (js/registan-3d.js),
+             поверх неба — заголовок, текст и кнопка (по центру) -->
+        <section id="hero">
+            <div class="hero-portal">
+                <div class="portal-frame">
+                    <!-- Сюда скрипт вставит <canvas> с 3D. Пока 3D нет
+                         (или WebGL не поддерживается) — видно обычное фото -->
+                    <div class="portal-scene" id="registan-3d" role="img"
+                         aria-label="Registan Square in Samarkand: the Ulugbek, Tilya-Kori and Sher-Dor madrasahs">
+                        <img class="portal-photo" src="images/registan-hero.jpg" width="2400" height="861" alt="">
+                    </div>
+
+                    <div class="portal-copy">
+                        <h1>Uzbekistan, one <span>courtyard</span> at a time</h1>
+                        <p class="hero-text">
+                            Small-group walks through Tashkent, Samarkand and Khiva with guides
+                            who grew up there. You see the full price before you book.
+                        </p>
+                        <a class="btn btn-gold" href="#tours">Choose a tour</a>
+                    </div>
+                </div>
+                <p class="portal-caption">
+                    Registan Square, Samarkand · three madrasahs built <span class="nowrap">1420–1660</span> ·
+                    drag to look around, double-click to reset
+                </p>
+            </div>
+        </section>
+
+        <!-- ===================== ТУРЫ =====================
+             Три div.card: 1 в ряд на телефоне, 2 с 768px, 3 с 1200px.
+             Вся карточка кликабельна: ссылка «Book» растянута на неё
+             через ::after (раздел 7 в CSS), а js/cards.js добавляет
+             3D-наклон и «полёт» при переходе -->
+        <section class="tours" id="tours">
+            <div class="container">
+                <div class="section-head">
+                    <h2>Three routes</h2>
+                    <p>From a morning in Tashkent's bazaar to three days inside the walls of Khiva.</p>
+                </div>
+
+                <div class="card-grid">
+
+                    <!-- Карточка 1 -->
+                    <div class="card">
+                        <span class="badge">Best seller</span>
+                        <!-- width/height в атрибутах — браузер заранее резервирует место,
+                             и страница не «прыгает» при загрузке фото -->
+                        <img class="card-photo" src="images/tashkent-chorsu.jpg" width="900" height="675"
+                             alt="The blue tiled dome of Chorsu Bazaar in Tashkent" loading="lazy">
+                        <div class="card-body">
+                            <p class="card-meta">Tashkent · 1 day</p>
+                            <h3>Old Tashkent Walk</h3>
+                            <p class="card-text">
+                                Chorsu Bazaar under its blue dome, Khast Imam Square and the
+                                quiet mahalla streets of the old city — on foot, with tea.
+                            </p>
+                            <div class="card-footer">
+                                <p class="price">35<span>USD / person</span></p>
+                                <!-- ?tour=… — booking.html сам выберет этот тур в списке -->
+                                <a class="btn btn-outline card-link" href="booking.html?tour=tashkent"
+                                   aria-label="Book Old Tashkent Walk">Book</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Карточка 2 -->
+                    <div class="card">
+                        <span class="badge">Top rated</span>
+                        <img class="card-photo" src="images/samarkand-gur-e-amir.jpg" width="900" height="675"
+                             alt="Gur-e-Amir mausoleum in Samarkand lit up at night" loading="lazy">
+                        <div class="card-body">
+                            <p class="card-meta">Samarkand · 2 days</p>
+                            <h3>Registan &amp; Gur-e-Amir</h3>
+                            <p class="card-text">
+                                The three madrasahs of Registan Square at sunset, and the ribbed
+                                blue dome over the tomb of Amir Timur after dark.
+                            </p>
+                            <div class="card-footer">
+                                <p class="price">120<span>USD / person</span></p>
+                                <a class="btn btn-outline card-link" href="booking.html?tour=samarkand"
+                                   aria-label="Book Registan and Gur-e-Amir">Book</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Карточка 3 -->
+                    <div class="card">
+                        <span class="badge">New</span>
+                        <img class="card-photo" src="images/khiva-kalta-minor.jpg" width="900" height="675"
+                             alt="The unfinished Kalta Minor minaret in Khiva's Itchan Kala at night" loading="lazy">
+                        <div class="card-body">
+                            <p class="card-meta">Khiva · 3 days</p>
+                            <h3>Khiva Itchan Kala</h3>
+                            <p class="card-text">
+                                A whole city inside clay walls: the unfinished Kalta Minor,
+                                palaces with carved wooden columns, sunrise from the ramparts.
+                            </p>
+                            <div class="card-footer">
+                                <p class="price">210<span>USD / person</span></p>
+                                <a class="btn btn-outline card-link" href="booking.html?tour=khiva"
+                                   aria-label="Book Khiva Itchan Kala">Book</a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===================== ПОДВАЛ ===================== -->
+    <footer class="site-footer">
+        <div class="container">
+            <p class="footer-brand">
+                <span class="logo-mark" aria-hidden="true"></span>
+                <strong>Registan Travel</strong>
+            </p>
+            <p>Tashkent, Uzbekistan · <a class="tel" href="tel:+998710000000">+998 71 000 00 00</a></p>
+            <p>© 2026 Registan Travel. A fictional company for CSIT248 Lab 5.</p>
+            <!-- Фото с Wikimedia Commons: лицензии CC требуют указать автора -->
+            <p class="credits">
+                Photos, Wikimedia Commons: Registan — Gilad Rom (CC BY 2.0) ·
+                Chorsu Bazaar — Adam Harangozó (CC BY-SA 4.0) ·
+                Gur-e-Amir — Arina Pan (CC BY-SA 4.0) ·
+                Kalta Minor — Bgag (CC0). 3D: Three.js (MIT).
+            </p>
+        </div>
+    </footer>
+
+    <!-- Скрипты в конце body: к этому моменту вся разметка уже в DOM -->
+    <script src="js/cards.js"></script>
+    <!-- Three.js лежит в проекте — сайт работает и без интернета -->
+    <script src="js/vendor/three.min.js"></script>
+    <script src="js/vendor/GLTFLoader.js"></script>
+    <script src="js/vendor/meshopt_decoder.js"></script>
+    <script src="js/registan-3d.js"></script>
+    <script src="js/scroll.js"></script>
+</body>
+</html>

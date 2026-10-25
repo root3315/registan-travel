@@ -1,0 +1,1695 @@
+/* Hallmark · macrostructure: Portal (3D arch hero) · tone: editorial, warm · anchor hue: brand gold #E0A526 on Registan night */
+
+/* ==========================================================================
+   Registan Travel — общий файл стилей для index.html и booking.html
+   --------------------------------------------------------------------------
+   Подход MOBILE FIRST: сначала пишем правила для телефона (они без медиа-
+   запросов), а потом через @media (min-width: …) только ДОБАВЛЯЕМ то, что
+   меняется на планшете (768px) и десктопе (1200px).
+
+   Идея дизайна: hero — арка-портал (iwan), внутри живая 3D-площадь
+   Регистан. Шапка — «жидкое стекло», как на iPhone.
+   Две темы: светлая (день) и тёмная (ночь) — переключаются кнопкой
+   в шапке, в 3D при этом садится или встаёт солнце.
+
+   Оглавление:
+     1. Переменные: бренд, светлая и тёмная тема, размеры, анимации
+     2. Базовые правила (сброс, шрифты, фон, фокус)
+     3. Шапка «жидкое стекло» и меню (fixed + flexbox + LVHA)
+     4. Кнопка смены темы
+     5. Кнопки
+     6. Hero: арка-портал с 3D        ┐
+     7. Карточки туров                │  ← Home page (Part A)
+     8. Подвал                        ┘
+     9. Страница бронирования (Part B)
+    10. Анимации
+    11. Медиа-запросы: телефон, планшет, десктоп, мышь, «меньше движения»
+   ========================================================================== */
+
+
+/* ==========================================================================
+   1. ПЕРЕМЕННЫЕ
+   ========================================================================== */
+:root {
+    /* Цвета из брендбука — не меняются ни в одной теме */
+    --night: #0B1F4B;   /* Registan Night — шапка, подвал, заголовки, кнопки */
+    --gold:  #E0A526;   /* Tile Gold — hover, бейджи, активный пункт меню    */
+    --brick: #C0392B;   /* Brick Red — ошибки и звёздочки обязательных полей */
+    --sand:  #FAF6EE;   /* Sand — фон страницы (в светлой теме)              */
+
+    /* Производные оттенки бренда */
+    --night-light: #1C3A78;
+    --night-deep:  #07142F;
+    --gold-dark:   #B07F14;
+    --white:       #FFFFFF;
+
+    /* «Смысловые» цвета — именно их меняет тёмная тема.
+       В правилах ниже используем только их, а не конкретные hex */
+    --bg:          var(--sand);    /* фон страницы */
+    --surface:     #FFFFFF;        /* карточки, форма, поля */
+    --text:        #1D2433;        /* основной текст */
+    --muted:       #5B6475;        /* второстепенный текст */
+    --heading:     var(--night);   /* заголовки, подписи полей, цены */
+    --line:        #E3D9C6;        /* тонкие рамки и разделители */
+    --field-line:  #CFC2A8;        /* рамка полей формы — чуть заметнее */
+    --soft:        #F6EBD0;        /* мягкая золотая подложка */
+    --btn-bg:      var(--night);   /* основная кнопка */
+    --btn-text:    var(--white);
+    --error-text:  var(--brick);
+    --error-bg:    #FDECEA;
+    --success:     #1E7B4F;
+    --success-bg:  #E8F5EE;
+    --hero-top:    var(--night-light);   /* градиент фона hero */
+    --hero-bottom: var(--night);
+    --sky-text:    var(--night);   /* текст поверх 3D-неба: днём тёмный */
+    --sky-subtext: #24365F;
+
+    /* Размеры */
+    --header-h:   60px;        /* высота стеклянной шапки */
+    --header-gap: 10px;        /* отступ шапки от краёв экрана */
+    --header-space: calc(var(--header-h) + 2 * var(--header-gap));
+    --radius:     16px;        /* крупные блоки: карточки, форма */
+    --radius-sm:  10px;        /* мелкие: кнопки, поля, сообщения */
+    --portal-drop: 110px;      /* насколько арка опускается ниже синего поля
+                                  (нужна и #hero, и .tours — поэтому в :root) */
+    --shadow:      0 1px 2px rgba(11, 31, 75, 0.06), 0 4px 14px rgba(11, 31, 75, 0.07);
+    --shadow-lift: 0 18px 40px rgba(11, 31, 75, 0.18);
+
+    /* Анимации: одна кривая и три длительности на весь сайт.
+       В режиме «меньше движения» длительности обнуляются (раздел 11) */
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --t-fast: 0.15s;
+    --t:      0.25s;
+    --t-slow: 0.5s;
+    --t-theme: 1.4s;   /* перетекание цветов при смене темы */
+    --t-sky:   2.4s;   /* текст на небе — в такт закату */
+    --t-intro: 1.8s;   /* фото в арке растворяется в 3D */
+}
+
+/* --- Тёмная тема: <html data-theme="dark"> ставит js/theme.js ---
+   Переопределяем только «смысловые» цвета — все правила ниже
+   автоматически становятся тёмными */
+:root[data-theme="dark"] {
+    --bg:          #08112A;
+    --surface:     #111F45;
+    --text:        #E6E1D6;
+    --muted:       #A6AEC3;
+    --heading:     #F4E8CC;
+    --line:        #23345F;
+    --field-line:  #34497F;
+    --soft:        #2A2716;
+    --btn-bg:      var(--gold);
+    --btn-text:    var(--night);
+    --error-text:  #FF8F80;
+    --error-bg:    #3A1A22;
+    --success:     #6BD49F;
+    --success-bg:  #10342A;
+    --hero-top:    #0A1736;
+    --hero-bottom: #050B1F;
+    --sky-text:    #FFFFFF;
+    --sky-subtext: rgba(255, 255, 255, 0.82);
+    --shadow:      0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 18px rgba(0, 0, 0, 0.3);
+    --shadow-lift: 0 18px 40px rgba(0, 0, 0, 0.45);
+    color-scheme: dark;            /* тёмные полосы прокрутки и календарь */
+}
+
+
+/* ==========================================================================
+   2. БАЗОВЫЕ ПРАВИЛА
+   ========================================================================== */
+
+/* box-sizing: border-box — padding и border входят в заданную ширину.
+   Без этого width: 100% + padding вылезает за родителя (см. Bug 3).
+   Это ГРУППОВОЙ селектор: одно правило для трёх селекторов через запятую. */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    /* при переходе по якорю (#tours) контент не уедет под фиксированную шапку */
+    scroll-padding-top: var(--header-space);
+    /* clip, а не hidden: hidden сделал бы html «прокручиваемым контейнером»
+       и сломал бы анимации по прокрутке (animation-timeline: view()) */
+    overflow-x: clip;
+}
+
+body {
+    display: flex;                 /* подвал всегда прижат к низу экрана */
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+    /* Шапка position: fixed «выпадает» из потока и накрывает начало страницы.
+       Отступ сверху ровно на её высоту (+ зазоры) — контент не прячется */
+    padding-top: var(--header-space);
+    overflow-x: clip;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+main {
+    flex: 1;
+}
+
+/* Групповой селектор: все заголовки — Georgia и «смысловой» цвет заголовков */
+h1,
+h2,
+h3 {
+    margin: 0 0 0.5em;
+    font-family: Georgia, serif;
+    font-weight: normal;        /* у Georgia обычное начертание красивее жирного */
+    color: var(--heading);
+    line-height: 1.15;
+}
+
+p {
+    margin: 0 0 1em;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+/* Контейнер: ограничивает ширину контента и центрирует его */
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
+/* Видимый фокус для клавиатуры: золотая рамка на ссылках и кнопках.
+   :focus-visible — рамка появляется только при Tab, не при клике мышью */
+a:focus-visible,
+button:focus-visible {
+    outline: 3px solid var(--gold);
+    outline-offset: 3px;
+}
+
+/* Плавная смена темы: класс theme-anim висит на <html> ~2 секунды
+   после нажатия кнопки — все цвета перетекают, а не «щёлкают» */
+.theme-anim,
+.theme-anim * {
+    transition: background-color var(--t-theme) var(--ease-out), color var(--t-theme) var(--ease-out),
+                border-color var(--t-theme) var(--ease-out), box-shadow var(--t-theme) var(--ease-out);
+}
+
+
+/* ==========================================================================
+   3. ШАПКА «ЖИДКОЕ СТЕКЛО» И МЕНЮ
+   ========================================================================== */
+
+/* position: fixed — шапка привязана к окну и не уезжает при прокрутке.
+   Она «парит» с отступами от краёв: стеклянная панель со скруглением */
+.site-header {
+    position: fixed;
+    top: var(--header-gap);
+    left: var(--header-gap);
+    right: var(--header-gap);
+    z-index: 100;
+    max-width: 1220px;
+    height: var(--header-h);
+    margin: 0 auto;                /* left + right + max-width → по центру */
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 22px;
+    /* Стекло = полупрозрачный цвет + размытие того, что под ним */
+    background: rgba(11, 31, 75, 0.62);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+    /* Блик по верхней кромке и мягкая тень снизу — как у стекла iOS */
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.28),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+        0 10px 30px rgba(7, 20, 47, 0.28);
+}
+
+/* Световой «отблеск» на стекле — полупрозрачный градиент поверх панели */
+.site-header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0) 55%);
+    pointer-events: none;          /* отблеск не мешает кликам */
+}
+
+/* Flexbox: логотип слева, меню справа */
+.site-header .container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 100%;
+    max-width: none;
+    padding: 0 10px 0 14px;
+}
+
+/* --- Логотип --- */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: Georgia, serif;
+    font-size: 1.05rem;
+    color: var(--white);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+/* Знак-арка (iwan) — нарисован чистым CSS: скругление только сверху,
+   двойная тень изнутри даёт тонкую золотую рамку внутри арки */
+.logo-mark {
+    flex: none;
+    width: 24px;
+    height: 32px;
+    border-radius: 12px 12px 3px 3px;
+    background: var(--gold);
+    box-shadow: inset 0 0 0 4px var(--gold), inset 0 0 0 6px var(--night);
+}
+
+/* Слово «Travel» выделяем золотом (<span> внутри логотипа) */
+.logo-accent {
+    color: var(--gold);
+}
+
+/* --- Меню: margin-left: auto отталкивает его к правому краю --- */
+.main-nav {
+    margin-left: auto;
+}
+
+.main-nav ul {
+    display: flex;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.main-nav a {
+    display: block;
+    padding: 9px 10px;
+    border-radius: var(--radius-sm);
+    font-size: 0.95rem;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background-color var(--t) var(--ease-out), color var(--t) var(--ease-out);
+}
+
+/* Порядок LVHA: :link → :visited → :hover → :active.
+   У всех четырёх правил одинаковая специфичность, поэтому побеждает то,
+   что написано НИЖЕ. Если :visited поставить после :hover, посещённые
+   ссылки перестанут подсвечиваться (ровно это и есть Bug 1). */
+.main-nav a:link {
+    color: var(--white);
+}
+
+.main-nav a:visited {
+    color: var(--white);
+}
+
+.main-nav a:hover {
+    background-color: var(--gold);
+    color: var(--night);
+}
+
+.main-nav a:active {
+    background-color: var(--gold-dark);
+    color: var(--night);
+}
+
+/* Текущая страница: лёгкая стеклянная подложка (как выбранный сегмент
+   в iOS) и короткая золотая черта — нижний бордер псевдоэлемента ::after.
+   Черта ровная и по центру: на всю ширину скруглённой ссылки она
+   загибалась бы по углам «улыбкой» */
+.main-nav a.active {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.main-nav a.active::after {
+    content: "";
+    display: block;
+    width: 18px;
+    margin: 3px auto -6px;         /* -6px: ссылка не становится выше */
+    border-bottom: 3px solid var(--gold);
+    border-radius: 2px;
+}
+
+/* При наведении на активную ссылку черта темнеет — на золотом фоне
+   золотая черта иначе пропала бы */
+.main-nav a.active:hover::after {
+    border-bottom-color: var(--night);
+}
+
+/* Кнопка «Book now» в шапке: на телефоне места нет — прячем, показываем
+   с планшета (раздел 11). Селектор из ДВУХ классов специально: у .btn ниже
+   по файлу тоже есть display, и при равной специфичности он бы победил */
+.site-header .header-cta {
+    display: none;
+}
+
+
+/* ==========================================================================
+   4. КНОПКА СМЕНЫ ТЕМЫ
+   ========================================================================== */
+
+/* --- Кнопка «день / ночь» --- */
+.theme-toggle {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin-left: 4px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.08);
+    cursor: pointer;
+    transition: background-color var(--t) var(--ease-out), scale var(--t-fast) var(--ease-out);
+}
+
+/* Нажатие на кнопку темы — она чуть вдавливается */
+.theme-toggle:active {
+    scale: 0.9;
+}
+
+/* Иконка — линейный SVG из двух частей: солнце (круг + 8 лучей) и месяц.
+   Видна одна из них; при смене темы солнце поворачивается и уменьшается,
+   а месяц «выкатывается» на его место. transform-box: fill-box —
+   вращаем каждую часть вокруг её собственного центра */
+.theme-icon {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.icon-sun,
+.icon-moon {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: opacity var(--t-slow) var(--ease-out), rotate var(--t-slow) var(--ease-out),
+                scale var(--t-slow) var(--ease-out);
+}
+
+.icon-moon {
+    stroke: #F4E8CC;
+    opacity: 0;
+    rotate: -60deg;
+    scale: 0.6;
+}
+
+:root[data-theme="dark"] .icon-sun {
+    opacity: 0;
+    rotate: 90deg;
+    scale: 0.6;
+}
+
+:root[data-theme="dark"] .icon-moon {
+    opacity: 1;
+    rotate: 0deg;
+    scale: 1;
+}
+
+
+/* ==========================================================================
+   5. КНОПКИ
+   ========================================================================== */
+.btn {
+    display: inline-block;
+    padding: 12px 24px;
+    border: 2px solid var(--btn-bg);
+    border-radius: var(--radius-sm);
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    font-family: Arial, sans-serif;
+    font-size: 1rem;
+    font-weight: bold;
+    line-height: 1.5;               /* 12 + 24 + 12 + рамки = 52px — удобно пальцем */
+    letter-spacing: 0.02em;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform var(--t-fast) var(--ease-out), translate var(--t) var(--ease-out),
+                background-color var(--t) var(--ease-out), color var(--t) var(--ease-out),
+                border-color var(--t) var(--ease-out);
+}
+
+/* Нажатие: кнопка опускается на место и чуть «вдавливается» (97%).
+   :not(:disabled) — та же специфичность, что у hover ниже, но правило
+   стоит позже в файле и поэтому побеждает при нажатии */
+.btn:not(:disabled):active {
+    translate: 0 0;
+    transform: scale(0.97);
+}
+
+/* Золотая кнопка — для тёмного фона (шапка, hero) */
+.btn-gold {
+    border-color: var(--gold);
+    background: var(--gold);
+    color: var(--night);
+}
+
+/* Тихая кнопка в карточках — не спорит с фотографией и ценой */
+.btn-outline {
+    border-color: var(--soft);
+    background: var(--soft);
+    color: var(--heading);
+}
+
+/* Кнопка на всю ширину (форма бронирования) */
+.btn-block {
+    display: block;
+    width: 100%;
+}
+
+/* Заблокированная кнопка = запрос уже отправлен: зелёная с галочкой */
+.btn:disabled {
+    border-color: var(--success);
+    background: var(--success);
+    color: var(--white);
+    cursor: default;
+}
+
+.btn:disabled::before {
+    content: "✓ ";
+}
+
+
+/* ==========================================================================
+   6. HERO: АРКА-ПОРТАЛ С 3D
+   ID-селектор (#hero) — на странице такой блок ровно один.
+
+   Синий фон hero заходит ПОД стеклянную шапку (отрицательный margin-top),
+   чтобы сквозь стекло было видно синее, а не песочную полосу.
+   Отступ сверху увеличен на ту же величину — текст под шапку не попадает.
+   ========================================================================== */
+#hero {
+    /* flow-root запрещает отрицательному margin арки «схлопнуться» с hero:
+       без него синий фон растянулся бы вместе с аркой до самого низа */
+    display: flow-root;
+    margin-top: calc(-1 * var(--header-space));
+    padding-top: calc(var(--header-space) + 12px);
+    /* Фон по заданию — градиент (в тёмной теме — ночной) */
+    background: linear-gradient(180deg, var(--hero-top) 0%, var(--hero-bottom) 75%);
+    text-align: center;
+}
+
+/* --- Арка --- */
+.hero-portal {
+    position: relative;
+    z-index: 1;                       /* поверх песочной секции ниже */
+    width: min(100% - 24px, 1160px);  /* по 12px от краёв экрана */
+    /* отрицательный нижний отступ «вытягивает» арку за пределы синего поля */
+    margin: 0 auto calc(-1 * var(--portal-drop));
+}
+
+/* Золотая рама. Арка = большой border-radius у верхних углов:
+   50% по горизонтали + 36% по вертикали дают полукруглый верх.
+   outline повторяет скругление — вторая тонкая линия, как у портала */
+.portal-frame {
+    position: relative;
+    aspect-ratio: 3 / 4.4;            /* на телефоне арка высокая */
+    overflow: hidden;
+    border-radius: 50% 50% var(--radius) var(--radius) / 36% 36% var(--radius) var(--radius);
+    background: var(--gold);
+    outline: 1px solid rgba(224, 165, 38, 0.55);
+    outline-offset: 7px;
+    box-shadow: 0 30px 60px rgba(5, 11, 31, 0.4);
+    isolation: isolate;               /* Safari: скругление не «слетает» */
+}
+
+/* Сцена внутри рамы (отступ 6px = ширина золотой рамы):
+   canvas 3D или запасное фото */
+.portal-scene {
+    position: absolute;
+    inset: 6px;
+    overflow: hidden;
+    border-radius: inherit;
+    background: #8DB4E2;
+}
+
+.portal-scene canvas,
+.portal-photo {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.portal-photo {
+    position: absolute;
+    inset: 0;
+    z-index: 1;                    /* фото лежит поверх 3D-сцены */
+    object-fit: cover;
+    object-position: center bottom;
+    transition: filter var(--t-theme) var(--ease-out), opacity var(--t-intro) var(--ease-out),
+                scale var(--t-intro) var(--ease-out);
+}
+
+/* Интро: первые 3 секунды в арке настоящее фото, потом registan-3d.js
+   ставит класс scene-live — фото растворяется и чуть «отъезжает»,
+   под ним уже живая 3D-площадь */
+.scene-live .portal-photo {
+    opacity: 0;
+    scale: 1.04;
+    pointer-events: none;
+}
+
+/* Повторный заход в сессии: интро уже видели — без плавного затухания */
+.no-intro .portal-photo {
+    transition: none;
+}
+
+/* Класс intro-seen ставит theme.js в <head> (до отрисовки): фото не показываем вовсе */
+.intro-seen .portal-photo {
+    display: none;
+}
+
+/* Ночью фото затемняем, чтобы белый текст читался */
+:root[data-theme="dark"] .portal-photo {
+    filter: brightness(0.42) saturate(0.8);
+}
+
+/* Сцену можно крутить мышкой (js/registan-3d.js): курсор-«рука»,
+   без выделения текста при перетаскивании. touch-action: pan-y —
+   на телефоне вертикальный свайп по-прежнему листает страницу */
+.portal-frame {
+    cursor: grab;
+    touch-action: pan-y;
+    user-select: none;
+}
+
+.portal-frame.is-orbiting {
+    cursor: grabbing;
+}
+
+/* Пока крутим — текст почти прозрачный и не мешает смотреть */
+.portal-copy {
+    transition: opacity var(--t-slow) var(--ease-out);
+}
+
+.is-orbiting .portal-copy {
+    opacity: 0.12;
+}
+
+/* Текст поверх неба внутри арки. Цвет зависит от темы и
+   перетекает вместе с закатом (длинный transition) */
+.portal-copy {
+    position: absolute;
+    top: 15%;
+    left: 50%;
+    z-index: 1;
+    width: min(88%, 680px);
+    translate: -50% 0;
+}
+
+#hero h1 {
+    color: var(--sky-text);
+    font-size: 2.15rem;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    overflow-wrap: anywhere;
+    text-wrap: balance;
+    transition: color var(--t-sky) var(--ease-out);
+}
+
+/* Золотое слово в заголовке — цветом, а не курсивом */
+#hero h1 span {
+    color: var(--gold-dark);
+    transition: color var(--t-sky) var(--ease-out);
+}
+
+:root[data-theme="dark"] #hero h1 span {
+    color: var(--gold);
+}
+
+.hero-text {
+    max-width: 460px;
+    margin: 0 auto 20px;
+    color: var(--sky-subtext);
+    font-size: 1rem;
+    text-wrap: balance;
+    transition: color var(--t-sky) var(--ease-out);
+}
+
+/* Подпись под аркой — уже на песочном фоне */
+.portal-caption {
+    margin: 16px 0 0;
+    color: var(--muted);
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    text-wrap: balance;
+}
+
+
+/* ==========================================================================
+   7. КАРТОЧКИ ТУРОВ
+   ========================================================================== */
+
+/* Сверху отступ = высота «выпавшей» части арки + обычный отступ секции */
+.tours {
+    padding: calc(var(--portal-drop) + 56px) 0 48px;
+}
+
+/* Заголовок секции — по левому краю, короткая золотая черта под ним */
+.section-head {
+    margin-bottom: 32px;
+}
+
+.section-head h2 {
+    margin-bottom: 8px;
+    font-size: 2rem;
+}
+
+.section-head p {
+    max-width: 460px;
+    margin: 0;
+    color: var(--muted);
+}
+
+/* Сетка карточек. Mobile first: на телефоне ОДНА колонка.
+   minmax(0, 1fr) вместо 1fr — картинка не сможет «распереть» колонку.
+   2 и 3 колонки включаются в медиа-запросах (раздел 11) */
+.card-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+}
+
+/* position: relative делает карточку «точкой отсчёта» для бейджа.
+   Без этого position: absolute у бейджа считается от всей страницы (Bug 2) */
+.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    isolation: isolate;            /* Safari: скругление не «слетает» при hover */
+    transition: transform var(--t) var(--ease-out), translate var(--t) var(--ease-out),
+                box-shadow var(--t) var(--ease-out);
+}
+
+/* --- 3D-наклон (углы считает js/cards.js) ---
+   --rx, --ry — наклон по осям, --mx, --my — где блик. По умолчанию 0 */
+.card {
+    --rx: 0deg;
+    --ry: 0deg;
+    --mx: 50%;
+    --my: 0%;
+    cursor: pointer;
+}
+
+/* Блик: светлое пятно там, где курсор, — как отражение на стекле */
+.card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border-radius: inherit;
+    background: radial-gradient(circle at var(--mx) var(--my), rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 55%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--t) var(--ease-out);
+}
+
+/* Вся карточка кликабельна: клик по ней ловит js/cards.js и открывает
+   ссылку «Book». Для клавиатуры и скринридера это по-прежнему одна
+   обычная ссылка (cursor: pointer у .card — выше) */
+
+/* Карточка в фокусе с клавиатуры (Tab на «Book») поднимается так же,
+   как при наведении мышью — клавиатурные пользователи тоже видят отклик */
+.card:focus-within {
+    translate: 0 -6px;
+    box-shadow: var(--shadow-lift);
+}
+
+/* «Влёт» в тур (js/cards.js): слой на весь экран поверх шапки.
+   Видимую часть задаёт анимация clip-path, положение фото — transform;
+   сами движения описаны в JS, здесь только внешний вид */
+.flight {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    overflow: hidden;
+    background: var(--night);
+    pointer-events: none;           /* слой не мешает кликам */
+}
+
+/* Рамка с фото: размеры ставит JS, растёт от левого верхнего угла */
+.flight-photo {
+    position: absolute;
+    transform-origin: 0 0;
+}
+
+.flight-photo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Затемнение сверху и снизу — чтобы название читалось на любом фото */
+.flight-shade {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(11, 31, 75, 0.35) 0%, rgba(11, 31, 75, 0) 30%,
+                rgba(11, 31, 75, 0) 45%, rgba(11, 31, 75, 0.9) 100%);
+}
+
+.flight-caption {
+    position: absolute;
+    left: 6vw;
+    right: 6vw;
+    bottom: 10vh;
+    color: var(--white);
+    text-shadow: 0 2px 24px rgba(7, 20, 47, 0.5);
+}
+
+/* «Tashkent · 1 day» — мелко, золотом, вразрядку */
+.flight-meta {
+    display: block;
+    color: var(--gold);
+    font-size: 0.95rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+/* Золотая черта — «прочерчивается» слева направо (scaleX в JS) */
+.flight-line {
+    display: block;
+    width: 72px;
+    height: 2px;
+    margin: 14px 0 18px;
+    background: var(--gold);
+    transform-origin: left;
+}
+
+/* overflow: hidden — невидимая кромка: название выезжает из-под неё снизу */
+.flight-caption strong {
+    display: block;
+    overflow: hidden;
+    padding-bottom: 0.08em;         /* хвосты букв (g, y) не обрезаются */
+    font-family: Georgia, serif;
+    font-size: clamp(2.6rem, 7vw, 5.8rem);
+    font-weight: normal;
+    line-height: 1.05;
+}
+
+.flight-caption strong span {
+    display: block;
+}
+
+/* Финал «влёта»: тёмно-синяя шторка, в которой растворяется кадр */
+.flight-veil {
+    position: absolute;
+    inset: 0;
+    background: var(--night);
+    opacity: 0;
+}
+
+/* Прилёт на booking.html?tour=… (класс ставит js/main.js): страница
+   начинается с того же тёмно-синего и проявляется — как продолжение
+   растворения на главной */
+@keyframes arrive {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    body.is-arriving::after,
+    .arrive-from-card body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 300;               /* выше шапки */
+        background: var(--night);
+        pointer-events: none;
+        animation: arrive 0.8s ease-out both;
+    }
+}
+
+/* Фото тура: 4:3, object-fit: cover обрезает лишнее без искажений */
+.card-photo {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    transition: transform var(--t-slow) var(--ease-out);
+}
+
+/* Бейдж в правом верхнем углу — абсолютное позиционирование
+   относительно .card (у неё position: relative) */
+.badge {
+    position: absolute;
+    top: 0;
+    right: 16px;
+    z-index: 1;                     /* поверх фото */
+    padding: 12px 10px 8px;
+    border-radius: 0 0 8px 8px;     /* «язычок» билета, свисающий с края */
+    background: var(--gold);
+    color: var(--night);
+    font-size: 0.7rem;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    box-shadow: 0 2px 8px rgba(7, 20, 47, 0.25);
+    transition: translate var(--t) var(--ease-out);
+}
+
+.card-body {
+    display: flex;
+    flex: 1;                        /* низ всех карточек в ряду — на одной линии */
+    flex-direction: column;
+    padding: 20px 20px 22px;
+}
+
+/* «Tashkent · 1 day» — город и длительность одной строкой */
+.card-meta {
+    margin-bottom: 4px;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.card h3 {
+    font-size: 1.5rem;
+}
+
+.card-text {
+    color: var(--muted);
+}
+
+/* Нижняя строка: цена слева, кнопка справа.
+   margin-top: auto прижимает её к низу карточки */
+.card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+}
+
+/* Цена — Arial: у Georgia цифры «прыгают» по высоте (старостильные) */
+.price {
+    margin: 0;
+    color: var(--heading);
+    font-size: 1.9rem;
+    font-weight: bold;
+    letter-spacing: -0.02em;
+    line-height: 1;
+}
+
+/* <span> внутри цены — мелкая подпись «USD / person» */
+.price span {
+    margin-left: 4px;
+    color: var(--muted);
+    font-size: 0.8rem;
+    font-weight: normal;
+    letter-spacing: 0;
+}
+
+
+/* ==========================================================================
+   8. ПОДВАЛ
+   ========================================================================== */
+/* Подвал — одна компактная полоса: логотип, контакты, копирайт,
+   а авторы фото мелкой строкой внизу. Телефон: всё в столбик */
+.site-footer {
+    padding: 22px 0 18px;
+    border-radius: var(--radius) var(--radius) 0 0;
+    background: var(--night-deep);
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.88rem;
+}
+
+.site-footer .container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.site-footer p {
+    margin: 0;
+}
+
+/* Название с арочным знаком (тот же .logo-mark, что и в шапке), но меньше */
+.footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.site-footer .logo-mark {
+    width: 18px;
+    height: 24px;
+    border-radius: 9px 9px 2px 2px;
+    box-shadow: inset 0 0 0 3px var(--gold), inset 0 0 0 5px var(--night-deep);
+}
+
+/* С планшета — в ряд: бренд слева, контакты по центру, копирайт справа.
+   flex-wrap + flex-basis: 100% у авторов фото переносит их на вторую строку */
+@media (min-width: 768px) {
+    .site-footer .container {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px 32px;
+    }
+
+    .site-footer .credits {
+        flex-basis: 100%;
+    }
+}
+
+.site-footer strong {
+    color: var(--gold);
+    font-family: Georgia, serif;
+    font-weight: normal;
+    font-size: 1.15rem;
+}
+
+.site-footer a {
+    color: var(--white);
+    transition: color var(--t) var(--ease-out);
+}
+
+.site-footer a:hover {
+    color: var(--gold);
+}
+
+/* Номер телефона и даты не рвутся на две строки (групповой селектор) */
+.tel,
+.nowrap {
+    white-space: nowrap;
+}
+
+/* Авторы фотографий — мелко, но обязательно (условие лицензий CC BY) */
+.credits {
+    margin-top: 6px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.74rem;
+    line-height: 1.5;
+}
+
+
+/* ==========================================================================
+   9. СТРАНИЦА БРОНИРОВАНИЯ (Part B)
+   ========================================================================== */
+
+/* Баннер с фото галереи Хазрати Имам (Ташкент).
+   Как и hero, заходит под стеклянную шапку */
+.page-banner {
+    margin-top: calc(-1 * var(--header-space));
+    padding: calc(var(--header-space) + 48px) 0 40px;
+    background:
+        linear-gradient(90deg, rgba(11, 31, 75, 0.95) 0%, rgba(11, 31, 75, 0.6) 55%, rgba(11, 31, 75, 0.3) 100%),
+        url("../images/tashkent-hazrat-imam.jpg") center / cover no-repeat,
+        var(--night);
+    color: var(--white);
+}
+
+.page-banner h1 {
+    color: var(--white);
+    font-size: 2.2rem;
+}
+
+.page-banner p {
+    max-width: 460px;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* Раскладка: на телефоне форма и боковая колонка друг под другом */
+.booking-layout {
+    display: grid;
+    gap: 24px;
+    padding-top: 40px;
+    padding-bottom: 64px;
+}
+
+/* «Листы» формы и боковой колонки. Золотая полоса сверху нарисована
+   тенью изнутри: она повторяет скругление углов (толстый border-top
+   на скруглённом блоке сужался бы к краям «полумесяцем») */
+.form-card,
+.info-card {
+    padding: 40px 20px 24px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+/* Форма — «арка», как портал на главной; боковая колонка — без рамки */
+.form-card {
+    border-radius: 120px 120px var(--radius) var(--radius) / 48px 48px var(--radius) var(--radius);
+}
+
+.info-card {
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+/* --- Поля формы --- */
+.field {
+    margin-bottom: 20px;
+}
+
+/* display: block ставит label НАД полем */
+.field label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--heading);
+    font-weight: bold;
+    transition: color var(--t) var(--ease-out);
+}
+
+/* Пока человек печатает в поле — подпись этого поля золотеет */
+.field:focus-within label {
+    color: var(--night-light);
+}
+
+:root[data-theme="dark"] .field:focus-within label {
+    color: var(--gold);
+}
+
+/* Красная звёздочка генерируется CSS-ом через ::after,
+   в HTML её нет — достаточно повесить класс .required на <label> */
+.field label.required::after {
+    content: " *";
+    color: var(--error-text);
+}
+
+/* Все поля на 100% ширины. Благодаря border-box padding не ломает ширину */
+.field input,
+.field select {
+    display: block;
+    width: 100%;
+    min-width: 0;                  /* iOS: поле даты не вылезает за край */
+    min-height: 48px;
+    padding: 10px 12px;
+    border: 1.5px solid var(--field-line);
+    border-radius: var(--radius-sm);
+    background-color: var(--bg);
+    color: var(--text);
+    font: inherit;                 /* поля по умолчанию не наследуют шрифт */
+    transition: border-color var(--t) var(--ease-out), box-shadow var(--t) var(--ease-out),
+                background-color var(--t) var(--ease-out);
+}
+
+/* Список: своя стрелка вместо системной (рисуем SVG прямо в CSS) */
+.field select {
+    padding-right: 40px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23B07F14' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-position: right 14px center;
+    background-repeat: no-repeat;
+    background-size: 12px 8px;
+}
+
+/* В тёмной теме стрелка списка — светлое золото (тёмная не видна) */
+:root[data-theme="dark"] .field select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23E0A526' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+/* Заметный :focus — рамка цвета заголовков + золотое «свечение» */
+.field input:focus,
+.field select:focus {
+    outline: none;
+    border-color: var(--heading);
+    background-color: var(--surface);
+    box-shadow: 0 0 0 4px rgba(224, 165, 38, 0.4);
+}
+
+/* Подсветка поля с ошибкой — класс .is-error ставит JavaScript */
+.field.is-error input,
+.field.is-error select {
+    border-color: var(--error-text);
+    background-color: var(--error-bg);
+}
+
+/* Текст ошибки под полем; пустой — не занимает места */
+.field-error {
+    margin: 6px 0 0;
+    color: var(--error-text);
+    font-size: 0.875rem;
+}
+
+.field-error:empty {
+    display: none;
+}
+
+/* Два поля в одну строку (путешественники + дата) — на планшете и выше */
+.field-row {
+    display: grid;
+    gap: 0 16px;
+}
+
+/* --- Блок с итоговой ценой --- */
+.price-box {
+    margin: 4px 0 20px;
+    padding: 18px 20px;
+    border-radius: var(--radius-sm);
+    background: var(--night);
+    color: var(--white);
+}
+
+:root[data-theme="dark"] .price-box {
+    border: 1px solid var(--field-line);
+    background: var(--night-deep);
+}
+
+.price-label {
+    margin: 0 0 4px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.price-total {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: bold;
+    overflow-wrap: break-word;     /* JS ставит неразрывные пробелы — рвётся только у «=» */
+    text-wrap: balance;
+}
+
+.price-note {
+    margin: 6px 0 0;
+    color: var(--gold);
+    font-size: 0.875rem;
+    text-wrap: pretty;
+}
+
+/* --- Сообщения формы (ошибка / успех) ---
+   display НЕ задаём: иначе перебьём атрибут hidden, которым JS прячет блок */
+.alert {
+    margin-bottom: 20px;
+    scroll-margin-top: calc(var(--header-space) + 16px);   /* не прячется под шапку */
+    padding: 14px 16px;
+    border: 1.5px solid;
+    border-radius: var(--radius-sm);
+    overflow-wrap: anywhere;       /* очень длинное имя не вылезет за край */
+}
+
+/* Фокус на сообщение ставит JS (чтобы скринридер его прочитал) —
+   рамка браузера здесь не нужна, у блока уже есть своя рамка */
+.alert:focus {
+    outline: none;
+}
+
+.alert-error {
+    border-color: var(--error-text);
+    background: var(--error-bg);
+    color: var(--error-text);
+}
+
+.alert-success {
+    font-weight: bold;
+    border-color: var(--success);
+    background: var(--success-bg);
+    color: var(--success);
+}
+
+/* --- Боковая колонка с информацией --- */
+.info-card h2 {
+    font-size: 1.5rem;
+}
+
+.info-list {
+    margin: 0 0 20px;
+    padding: 0;
+    list-style: none;
+}
+
+/* padding-left — место под ромб: перенесённая строка не уходит под маркер */
+.info-list li {
+    position: relative;
+    padding: 10px 0 10px 22px;
+    border-bottom: 1px solid var(--line);
+    text-wrap: pretty;
+}
+
+.info-list li:last-child {
+    border-bottom: 0;
+}
+
+/* Маркер списка — маленький золотой ромб (квадрат, повёрнутый на 45°) */
+.info-list li::before {
+    content: "";
+    position: absolute;
+    top: 19px;
+    left: 3px;
+    width: 7px;
+    height: 7px;
+    border-radius: 2px;
+    background: var(--gold);
+    rotate: 45deg;
+}
+
+.info-list a {
+    color: var(--heading);
+    font-weight: bold;
+}
+
+/* Плашка про скидку */
+.discount-tip {
+    margin: 0;
+    padding: 14px 16px;
+    border-radius: var(--radius-sm);
+    background: var(--soft);
+    color: var(--heading);
+}
+
+
+/* ==========================================================================
+   10. АНИМАЦИИ
+   Анимируем opacity и translate — это дёшево для браузера.
+   Свойство translate (а не transform) выбрано специально: так анимация
+   не конфликтует с transform: scale() у нажатой кнопки и с подъёмом
+   карточки при наведении — это РАЗНЫЕ свойства, они складываются.
+   ========================================================================== */
+
+/* «Всплытие»: элемент появляется и поднимается на 16px */
+@keyframes rise {
+    from {
+        opacity: 0;
+        translate: 0 16px;
+    }
+    to {
+        opacity: 1;
+        translate: 0 0;
+    }
+}
+
+/* «Выезд» сообщения формы сверху */
+@keyframes slide-down {
+    from {
+        opacity: 0;
+        translate: 0 -10px;
+    }
+    to {
+        opacity: 1;
+        translate: 0 0;
+    }
+}
+
+/* «Встряхивание» поля с ошибкой — как отрицательный кивок головой */
+@keyframes shake {
+    0%, 100% { translate: 0 0; }
+    25%      { translate: -6px 0; }
+    50%      { translate: 6px 0; }
+    75%      { translate: -3px 0; }
+}
+
+/* «Подскок» кнопки после успешной отправки */
+@keyframes pop {
+    50% {
+        scale: 1.05;
+    }
+}
+
+/* Появление арки: снизу и чуть меньше — «вырастает» из синего поля */
+@keyframes portal-in {
+    from {
+        opacity: 0;
+        translate: 0 40px;
+        scale: 0.96;
+    }
+    to {
+        opacity: 1;
+        translate: 0 0;
+        scale: 1;
+    }
+}
+
+/* Все анимации включаются ТОЛЬКО если человек не просил в системе
+   «уменьшить движение». Так надёжнее, чем потом выключать их правилом *:
+   у селекторов вроде #hero h1 специфичность выше, и * бы проиграл */
+@media (prefers-reduced-motion: no-preference) {
+
+    /* 1. Загрузка: арка вырастает, затем по очереди текст и кнопка
+       (animation-delay). fill-mode backwards — до старта элемент невидим,
+       а после конца анимация больше ни на что не влияет */
+    .hero-portal {
+        animation: portal-in 1.1s var(--ease-out) backwards;
+    }
+
+    #hero h1,
+    .hero-text,
+    #hero .btn-gold,
+    .page-banner h1,
+    .page-banner p,
+    .form-card,
+    .info-card {
+        animation: rise 0.6s var(--ease-out) backwards;
+    }
+
+    #hero h1 {
+        animation-delay: 0.35s;
+    }
+
+    .hero-text {
+        animation-delay: 0.45s;
+    }
+
+    #hero .btn-gold {
+        animation-delay: 0.55s;
+    }
+
+    .page-banner p {
+        animation-delay: 0.06s;
+    }
+
+    .form-card {
+        animation-delay: 0.14s;
+    }
+
+    .info-card {
+        animation-delay: 0.22s;
+    }
+
+    /* 2. Прокрутка: заголовок секции и карточки всплывают, когда въезжают
+       в экран. animation-timeline: view() привязывает анимацию не ко времени,
+       а к положению элемента на экране — без JavaScript.
+       Карточки одного ряда стартуют чуть по очереди (nth-child).
+       @supports: браузеры без этой функции просто покажут карточки сразу */
+    @supports (animation-timeline: view()) {
+        .section-head,
+        .card {
+            animation: rise 1ms var(--ease-out) backwards;
+            animation-timeline: view();
+            animation-range: entry 5% entry 70%;
+        }
+
+        .card:nth-child(3n + 2) {
+            animation-range: entry 12% entry 78%;
+        }
+
+        .card:nth-child(3n) {
+            animation-range: entry 20% entry 86%;
+        }
+    }
+
+    /* 3. Форма: сообщение выезжает, поле с ошибкой встряхивается,
+       блок цены поднимается последним */
+    .alert {
+        animation: slide-down 0.4s var(--ease-out) backwards;
+    }
+
+    .field.is-error input,
+    .field.is-error select {
+        animation: shake 0.35s var(--ease-out);
+    }
+
+    .price-box {
+        animation: rise 0.6s var(--ease-out) 0.3s backwards;
+    }
+
+    /* Текст ошибки под полем выезжает, а не выскакивает */
+    .field-error:not(:empty) {
+        animation: slide-down 0.3s var(--ease-out) backwards;
+    }
+
+    /* Успешная отправка: кнопка коротко «подпрыгивает» */
+    .btn:disabled {
+        animation: pop 0.45s var(--ease-out);
+    }
+
+    /* Логотип появляется вместе со страницей */
+    .logo {
+        animation: rise 0.6s var(--ease-out) backwards;
+    }
+
+    /* Пункты «Good to know» появляются по очереди */
+    .info-list li {
+        animation: rise 0.5s var(--ease-out) backwards;
+    }
+
+    .info-list li:nth-child(1) { animation-delay: 0.3s; }
+    .info-list li:nth-child(2) { animation-delay: 0.38s; }
+    .info-list li:nth-child(3) { animation-delay: 0.46s; }
+    .info-list li:nth-child(4) { animation-delay: 0.54s; }
+
+    /* Подвал всплывает, когда до него докрутили */
+    @supports (animation-timeline: view()) {
+        .site-footer .container {
+            animation: rise 1ms var(--ease-out) backwards;
+            animation-timeline: view();
+            animation-range: entry 0% entry 60%;
+        }
+    }
+}
+
+
+/* ==========================================================================
+   11. МЕДИА-ЗАПРОСЫ
+   Mobile first → для раскладки только min-width. Каждый следующий
+   запрос ДОПОЛНЯЕТ предыдущий, а не переписывает всё заново.
+   ========================================================================== */
+
+/* --- Самые узкие (до 399px): от логотипа остаётся знак-арка,
+   слово визуально скрыто, но скринридер его прочитает --- */
+@media (max-width: 399px) {
+    .logo-word {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+    }
+}
+
+/* --- Планшет: от 768px --- */
+@media (min-width: 768px) {
+
+    :root {
+        --portal-drop: 150px;
+    }
+
+    .logo {
+        gap: 10px;
+        font-size: 1.2rem;
+    }
+
+    .main-nav ul {
+        gap: 4px;
+    }
+
+    .main-nav a {
+        padding: 9px 14px;
+        font-size: 1rem;
+    }
+
+    /* Появляется кнопка «Book now» в шапке */
+    .site-header .header-cta {
+        display: inline-block;
+        margin-left: 8px;
+        padding: 7px 16px;
+        border-radius: 14px;
+    }
+
+    /* Арка шире: 4:3, верх почти полукруглый */
+    .portal-frame {
+        aspect-ratio: 4 / 3;
+        border-radius: 50% 50% var(--radius) var(--radius) / 62% 62% var(--radius) var(--radius);
+    }
+
+    .portal-copy {
+        top: 11%;
+    }
+
+    #hero h1 {
+        font-size: 3.2rem;
+    }
+
+    .hero-text {
+        font-size: 1.05rem;
+    }
+
+    .section-head h2 {
+        font-size: 2.6rem;
+    }
+
+    /* Две карточки в ряд */
+    .card-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .page-banner {
+        padding-top: calc(var(--header-space) + 72px);
+        padding-bottom: 56px;
+    }
+
+    .page-banner h1 {
+        font-size: 3rem;
+    }
+
+    /* Форма шире, боковая колонка уже */
+    .booking-layout {
+        grid-template-columns: 3fr 2fr;
+        align-items: start;
+    }
+
+    .form-card {
+        padding: 36px 32px 32px;
+    }
+
+    .field-row {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* --- Десктоп: от 1200px --- */
+@media (min-width: 1200px) {
+
+    :root {
+        --portal-drop: 190px;
+    }
+
+    /* Арка 16:10 — широкая площадь целиком */
+    .portal-frame {
+        aspect-ratio: 16 / 10;
+        border-radius: 50% 50% var(--radius) var(--radius) / 70% 70% var(--radius) var(--radius);
+    }
+
+    .portal-copy {
+        top: 10%;
+    }
+
+    #hero h1 {
+        font-size: 4rem;
+    }
+
+    /* Три карточки в ряд; средняя — «главная» (Самарканд) — чуть ниже,
+       ритм ряда перестаёт быть одинаковым */
+    .card-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        padding-bottom: 28px;
+    }
+
+    .card:nth-child(2) {
+        margin-top: 28px;
+        margin-bottom: -28px;
+    }
+}
+
+/* --- Эффекты наведения: только там, где есть мышь ---
+   На телефоне :hover «залипает» после тапа (карточка остаётся поднятой),
+   поэтому оборачиваем hover-эффекты в @media (hover: hover) */
+@media (hover: hover) {
+
+    /* :not(:disabled) — заблокированная кнопка не должна загораться */
+    .btn:not(:disabled):hover {
+        translate: 0 -2px;
+        border-color: var(--gold);
+        background: var(--gold);
+        color: var(--night);
+    }
+
+    /* Та же специфичность (0,3,0), что и строкой выше, но правило ниже —
+       поэтому золотая кнопка при наведении становится белой */
+    .btn-gold:not(:disabled):hover {
+        border-color: var(--white);
+        background: var(--white);
+    }
+
+    .theme-toggle:hover {
+        background: rgba(255, 255, 255, 0.18);
+    }
+
+    /* Карточка «поднимается» при наведении и наклоняется за курсором
+       (perspective — «расстояние до глаза», без неё поворот был бы плоским).
+       Фото чуть приближается, появляется блик */
+    .card:hover {
+        transform: perspective(900px) translateY(-8px) rotateX(var(--rx)) rotateY(var(--ry));
+        box-shadow: var(--shadow-lift);
+    }
+
+    .card:hover::before {
+        opacity: 1;
+    }
+
+    /* Во время «влёта» блик гаснет — у фото на весь экран его нет */
+    .card.is-flying::before {
+        opacity: 0;
+    }
+
+    /* Бейдж чуть «отрывается» от фото */
+    .card:hover .badge {
+        translate: 0 -3px;
+    }
+
+    /* Пока курсор над карточкой, наклон следует за ним быстро, без «резины» */
+    .card:hover {
+        transition: transform 0.12s linear, box-shadow var(--t) var(--ease-out);
+    }
+
+    .card:hover .card-photo {
+        transform: scale(1.04);
+    }
+}
+
+/* --- «Меньше движения» в настройках системы ---
+   Обнуляем длительности: все transition на сайте используют эти
+   переменные, поэтому переходы становятся мгновенными. Анимации и так
+   включены только для no-preference (раздел 10) */
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --t-fast:  0s;
+        --t:       0s;
+        --t-slow:  0s;
+        --t-theme: 0s;
+        --t-sky:   0s;
+        --t-intro: 0s;
+    }
+}
+
+/* Секция туров не ниже экрана: на широких мониторах страница иначе короче,
+   чем нужно, и браузер не может доехать заголовком до шапки (упирается в низ) */
+.tours {
+    min-height: 100vh;
+}
+
+/* Плавная прокрутка к якорю (кнопка «Choose a tour») + «прибытие» секции:
+   заголовок поднимается, карточки по очереди вспыхивают золотом.
+   Анимируем box-shadow и scale — их не трогает анимация появления карточек
+   (она на opacity/translate), поэтому не конфликтуют */
+@media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+    @keyframes tours-title { from { opacity: 0.2; translate: 0 18px; } to { opacity: 1; translate: 0 0; } }
+    /* Свечение: 0.5с разгорается, ~1.1с держится, 1.4с мягко гаснет (всего 3с).
+       Кривая у каждого отрезка своя: плавный вход, симметричный спад */
+    @keyframes tours-glow {
+        0%   { box-shadow: 0 0 0 0 rgba(224, 165, 38, 0); scale: 1;
+               animation-timing-function: var(--ease-out); }
+        17%  { box-shadow: 0 0 30px 2px rgba(224, 165, 38, 0.42); scale: 1.015;
+               animation-timing-function: linear; }
+        53%  { box-shadow: 0 0 30px 2px rgba(224, 165, 38, 0.42); scale: 1.015;
+               animation-timing-function: ease-in-out; }
+        100% { box-shadow: 0 0 0 0 rgba(224, 165, 38, 0); scale: 1; }
+    }
+    .is-arriving h2 { animation: tours-title 0.9s var(--ease-out) backwards; }
+    .is-arriving .card { animation: tours-glow 3s linear backwards; }
+    .is-arriving .card-grid > .card:nth-child(2),
+    .is-arriving .row > :nth-child(2) .card { animation-delay: 0.2s; }
+    .is-arriving .card-grid > .card:nth-child(3),
+    .is-arriving .row > :nth-child(3) .card { animation-delay: 0.4s; }
+}

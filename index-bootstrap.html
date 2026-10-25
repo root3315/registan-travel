@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registan Travel — Bootstrap version</title>
+    <meta name="description" content="Small-group tours of Tashkent, Samarkand and Khiva — Bootstrap 5 version.">
+    <!-- 1) Bootstrap 5 с CDN — даёт сетку, навбар, карточки, утилиты, тёмную тему -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <!-- 2) Наша тема ПОСЛЕ Bootstrap, чтобы переопределять его -->
+    <link rel="stylesheet" href="css/bootstrap-theme.css">
+    <!-- 3) Тема день/ночь — тот же скрипт, что и в Part A (ставит data-bs-theme) -->
+    <script src="js/theme.js"></script>
+</head>
+<body>
+
+    <!-- ===================== НАВБАР =====================
+         fixed-top        — шапка закреплена сверху (стекло — класс navbar-glass)
+         navbar-expand-md — с 768px меню в строку, на телефоне — «бургер» -->
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top navbar-glass" data-bs-theme="dark">
+        <div class="container-fluid position-relative px-3">
+            <a class="navbar-brand" href="index-bootstrap.html">
+                <span class="logo-mark" aria-hidden="true"></span>Registan <span class="text-gold">Travel</span>
+            </a>
+
+
+            <div class="d-flex align-items-center gap-2 order-md-last">
+                <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to night">
+                    <svg class="theme-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <g class="icon-sun">
+                        <circle cx="12" cy="12" r="4"/>
+                        <path d="M12 2.8v2.1M12 19.1v2.1M2.8 12h2.1M19.1 12h2.1M5.5 5.5l1.5 1.5M17 17l1.5 1.5M5.5 18.5L7 17M17 7l1.5-1.5"/>
+                    </g>
+                    <path class="icon-moon" d="M19.5 14.6A7.6 7.6 0 0 1 9.4 4.5a7.6 7.6 0 1 0 10.1 10.1z"/>
+                </svg>
+                </button>
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#mainMenu" aria-controls="mainMenu"
+                        aria-expanded="false" aria-label="Toggle menu">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+
+            <div class="collapse navbar-collapse" id="mainMenu">
+                <ul class="navbar-nav ms-auto me-md-2">
+                    <li class="nav-item"><a class="nav-link active fw-bold px-3" aria-current="page" href="index-bootstrap.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link fw-bold px-3" href="booking.html">Booking</a></li>
+                </ul>
+                <a class="btn btn-gold fw-bold px-3 me-md-2 d-none d-md-inline-block" href="booking.html">Book now</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <!-- ===================== HERO =====================
+             Арка с 3D-Регистаном — тот же js/registan-3d.js, что и в Part A -->
+        <section class="hero text-center">
+            <div class="hero-portal">
+                <div class="portal-frame">
+                    <div class="portal-scene" id="registan-3d" role="img"
+                         aria-label="Registan Square in Samarkand: the Ulugbek, Tilya-Kori and Sher-Dor madrasahs">
+                        <img class="portal-photo" src="images/registan-hero.jpg" width="2400" height="861" alt="">
+                    </div>
+                    <div class="portal-copy">
+                        <h1 class="display-4 mb-3">Uzbekistan, one <span>courtyard</span> at a time</h1>
+                        <p class="lead mb-4 col-lg-9 mx-auto">
+                            Small-group walks through Tashkent, Samarkand and Khiva with guides
+                            who grew up there. You see the full price before you book.
+                        </p>
+                        <a class="btn btn-gold btn-lg fw-bold px-4" href="#tours">Choose a tour</a>
+                    </div>
+                </div>
+                <p class="small text-secondary mt-3 mb-0">Registan Square, Samarkand · three madrasahs built <span class="text-nowrap">1420–1660</span> · drag to look around</p>
+            </div>
+        </section>
+
+        <!-- ===================== ТУРЫ =====================
+             Сетка Bootstrap: container → row → col-*
+             col-12    — телефон: 1 карточка в ряд (12 из 12 колонок)
+             col-md-6  — от 768px: 2 в ряд (6 из 12)
+             col-xl-4  — от 1200px: 3 в ряд (4 из 12)
+             Брейкпоинты md = 768px и xl = 1200px совпадают с заданием -->
+        <section class="tours pb-5" id="tours">
+            <div class="container">
+                <div class="mb-4">
+                    <h2 class="display-6">Three routes</h2>
+                    <p class="text-secondary mb-0">From a morning in Tashkent's bazaar to three days inside the walls of Khiva.</p>
+                </div>
+
+                <div class="row g-4">
+
+                    <div class="col-12 col-md-6 col-xl-4">
+                        <!-- position-relative + position-absolute у бейджа — тот же
+                             приём, что и в Part A, только классами Bootstrap -->
+                        <div class="card h-100 shadow-sm position-relative overflow-hidden">
+                            <span class="badge bg-gold text-dark text-uppercase position-absolute top-0 end-0 m-3 p-2 shadow-sm">Best seller</span>
+                            <img class="card-img-top" src="images/tashkent-chorsu.jpg" width="900" height="675" alt="The blue tiled dome of Chorsu Bazaar in Tashkent" loading="lazy">
+                            <div class="card-body d-flex flex-column">
+                                <p class="text-secondary mb-1">Tashkent · 1 day</p>
+                                <h3 class="card-title">Old Tashkent Walk</h3>
+                                <p class="card-text text-secondary">Chorsu Bazaar under its blue dome, Khast Imam Square and the quiet mahalla streets of the old city — on foot, with tea.</p>
+                                <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
+                                    <p class="fs-2 fw-bold mb-0 lh-1">35 <small class="fw-normal text-secondary">USD / person</small></p>
+                                    <a class="btn btn-soft fw-bold px-4 card-link" href="booking.html?tour=tashkent" aria-label="Book Old Tashkent Walk">Book</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6 col-xl-4">
+                        <div class="card h-100 shadow-sm position-relative overflow-hidden">
+                            <span class="badge bg-gold text-dark text-uppercase position-absolute top-0 end-0 m-3 p-2 shadow-sm">Top rated</span>
+                            <img class="card-img-top" src="images/samarkand-gur-e-amir.jpg" width="900" height="675" alt="Gur-e-Amir mausoleum in Samarkand lit up at night" loading="lazy">
+                            <div class="card-body d-flex flex-column">
+                                <p class="text-secondary mb-1">Samarkand · 2 days</p>
+                                <h3 class="card-title">Registan &amp; Gur-e-Amir</h3>
+                                <p class="card-text text-secondary">The three madrasahs of Registan Square at sunset, and the ribbed blue dome over the tomb of Amir Timur after dark.</p>
+                                <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
+                                    <p class="fs-2 fw-bold mb-0 lh-1">120 <small class="fw-normal text-secondary">USD / person</small></p>
+                                    <a class="btn btn-soft fw-bold px-4 card-link" href="booking.html?tour=samarkand" aria-label="Book Registan and Gur-e-Amir">Book</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6 col-xl-4">
+                        <div class="card h-100 shadow-sm position-relative overflow-hidden">
+                            <span class="badge bg-gold text-dark text-uppercase position-absolute top-0 end-0 m-3 p-2 shadow-sm">New</span>
+                            <img class="card-img-top" src="images/khiva-kalta-minor.jpg" width="900" height="675" alt="The unfinished Kalta Minor minaret in Khiva's Itchan Kala at night" loading="lazy">
+                            <div class="card-body d-flex flex-column">
+                                <p class="text-secondary mb-1">Khiva · 3 days</p>
+                                <h3 class="card-title">Khiva Itchan Kala</h3>
+                                <p class="card-text text-secondary">A whole city inside clay walls: the unfinished Kalta Minor, palaces with carved wooden columns, sunrise from the ramparts.</p>
+                                <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
+                                    <p class="fs-2 fw-bold mb-0 lh-1">210 <small class="fw-normal text-secondary">USD / person</small></p>
+                                    <a class="btn btn-soft fw-bold px-4 card-link" href="booking.html?tour=khiva" aria-label="Book Khiva Itchan Kala">Book</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===================== ПОДВАЛ ===================== -->
+    <footer class="footer-night text-white-50 py-3 rounded-top-4" data-bs-theme="dark">
+        <div class="container small">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-1 gap-md-4">
+                <p class="mb-0 d-flex align-items-center fw-bold text-gold fs-5">
+                    <span class="logo-mark footer-mark" aria-hidden="true"></span>Registan Travel
+                </p>
+                <p class="mb-0">Tashkent, Uzbekistan · <a class="text-white text-nowrap" href="tel:+998710000000">+998 71 000 00 00</a></p>
+                <p class="mb-0">© 2026 Registan Travel. Bootstrap 5 version for CSIT248 Lab 5.</p>
+            </div>
+            <p class="credits-line mb-0 mt-2 pt-2 border-top border-secondary">
+                Photos, Wikimedia Commons: Registan — Gilad Rom (CC BY 2.0) · Chorsu Bazaar — Adam Harangozó (CC BY-SA 4.0) ·
+                Gur-e-Amir — Arina Pan (CC BY-SA 4.0) · Kalta Minor — Bgag (CC0). 3D: Three.js (MIT).
+            </p>
+        </div>
+    </footer>
+
+    <!-- JS Bootstrap — для «бургера»; остальное — общие скрипты Part A -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/cards.js"></script>
+    <script src="js/vendor/three.min.js"></script>
+    <script src="js/vendor/GLTFLoader.js"></script>
+    <script src="js/vendor/meshopt_decoder.js"></script>
+    <script src="js/registan-3d.js"></script>
+    <script src="js/scroll.js"></script>
+</body>
+</html>

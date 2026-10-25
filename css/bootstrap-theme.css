@@ -1,0 +1,257 @@
+/* ==========================================================================
+   Registan Travel — тема для index-bootstrap.html (Part C)
+   --------------------------------------------------------------------------
+   Раскладку даёт Bootstrap 5: навбар, сетка container/row/col-*, карточки,
+   отступы, тёмная тема (data-bs-theme="dark"). Для РАСКЛАДКИ здесь нет
+   ни одной строки. Этот файл — только оформление, которого в Bootstrap нет:
+   цвета бренда, шрифты, стекло шапки, кнопка темы,
+   арка с 3D, наклон карточек и анимации.
+   ========================================================================== */
+
+/* --- 1. Бренд поверх CSS-переменных Bootstrap --- */
+:root {
+    --night: #0B1F4B;
+    --gold: #E0A526;
+    --gold-dark: #B07F14;
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --bs-body-bg: #FAF6EE;
+    --bs-body-font-family: Arial, sans-serif;
+    --bs-heading-color: #0B1F4B;
+    --bs-border-radius: 10px;
+    --bs-border-radius-lg: 16px;
+    --sky-text: #0B1F4B;
+}
+
+/* Тёмная тема: Bootstrap сам перекрашивает свои компоненты,
+   мы меняем только фон и цвет заголовков */
+[data-bs-theme="dark"] {
+    --bs-body-bg: #08112A;
+    --bs-heading-color: #F4E8CC;
+    --sky-text: #FFFFFF;
+}
+
+h1, h2, h3, .navbar-brand {
+    font-family: Georgia, serif;
+    font-weight: normal;
+}
+
+/* Отступ под стеклянный навбар: 60px высота + 2 × 10px зазоры */
+body {
+    padding-top: 80px;
+}
+
+.text-gold { color: var(--gold); }
+.bg-gold { background-color: var(--gold); }
+.footer-night { background-color: #07142F; }
+/* Подвал компактный: арочный знак поменьше, авторы фото — мелкой строкой */
+.footer-night .footer-mark { width: 18px; height: 24px; margin-right: 10px; vertical-align: 0; border-radius: 9px 9px 2px 2px; box-shadow: inset 0 0 0 3px var(--gold), inset 0 0 0 5px #07142F; }
+.footer-night .credits-line { font-size: 0.74rem; line-height: 1.5; color: rgba(255, 255, 255, 0.55); }
+.footer-night a { transition: color 0.25s var(--ease-out); }
+.footer-night a.text-white:hover { color: var(--gold); }
+
+/* Плавная смена темы (класс ставит js/theme.js на 2 секунды) */
+.theme-anim, .theme-anim * {
+    transition: background-color 1.4s var(--ease-out), color 1.4s var(--ease-out), border-color 1.4s var(--ease-out);
+}
+
+/* --- 2. Навбар «жидкое стекло» --- */
+.navbar-glass {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    max-width: 1220px;
+    min-height: 60px;
+    margin: 0 auto;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 22px;
+    background: rgba(11, 31, 75, 0.62);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 10px 30px rgba(7, 20, 47, 0.28);
+}
+
+.logo-mark {
+    display: inline-block;
+    width: 22px;
+    height: 30px;
+    margin-right: 8px;
+    vertical-align: -7px;
+    border-radius: 11px 11px 3px 3px;
+    background: var(--gold);
+    box-shadow: inset 0 0 0 4px var(--gold), inset 0 0 0 6px var(--night);
+}
+
+/* Пункты меню: скруглённые, золотой hover, активный — короткая золотая черта */
+.navbar-dark .nav-link {
+    border-radius: var(--bs-border-radius);
+    transition: background-color 0.25s var(--ease-out), color 0.25s var(--ease-out);
+}
+.navbar-dark .nav-link:hover { background-color: var(--gold); color: var(--night); }
+.navbar-dark .nav-link.active { background-color: rgba(255, 255, 255, 0.1); }
+.navbar-dark .nav-link.active::after {
+    content: "";
+    display: block;
+    width: 18px;
+    margin: 2px auto -4px;
+    border-bottom: 3px solid var(--gold);
+    border-radius: 2px;
+}
+
+/* Видимый фокус с клавиатуры */
+.btn:focus-visible,
+.navbar-dark .nav-link:focus-visible,
+.theme-toggle:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; box-shadow: none; }
+
+/* --- 4. Кнопка «день / ночь» --- */
+.theme-toggle {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.08);
+}
+.theme-icon { width: 22px; height: 22px; fill: none; stroke: var(--gold); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.icon-sun, .icon-moon { transform-box: fill-box; transform-origin: center; transition: opacity 0.5s var(--ease-out), rotate 0.5s var(--ease-out), scale 0.5s var(--ease-out); }
+.icon-moon { stroke: #F4E8CC; opacity: 0; rotate: -60deg; scale: 0.6; }
+:root[data-bs-theme="dark"] .icon-sun { opacity: 0; rotate: 90deg; scale: 0.6; }
+:root[data-bs-theme="dark"] .icon-moon { opacity: 1; rotate: 0deg; scale: 1; }
+
+/* --- 5. Кнопки бренда (+ свои цвета для :active, иначе Bootstrap делает их прозрачными) --- */
+.btn-gold {
+    --bs-btn-bg: var(--gold); --bs-btn-color: var(--night); --bs-btn-border-color: var(--gold);
+    --bs-btn-hover-bg: #fff; --bs-btn-hover-color: var(--night); --bs-btn-hover-border-color: #fff;
+    --bs-btn-active-bg: var(--gold); --bs-btn-active-color: var(--night); --bs-btn-active-border-color: var(--gold);
+}
+.btn-soft {
+    --bs-btn-bg: #F6EBD0; --bs-btn-color: var(--night); --bs-btn-border-color: #F6EBD0;
+    --bs-btn-hover-bg: var(--gold); --bs-btn-hover-color: var(--night); --bs-btn-hover-border-color: var(--gold);
+    --bs-btn-active-bg: var(--gold); --bs-btn-active-color: var(--night); --bs-btn-active-border-color: var(--gold);
+}
+:root[data-bs-theme="dark"] .btn-soft { --bs-btn-bg: #2A2716; --bs-btn-color: #F4E8CC; --bs-btn-border-color: #2A2716; }
+.btn:active { transform: scale(0.97); }
+
+/* --- 6. Hero: арка с 3D (как в Part A) --- */
+.hero {
+    display: flow-root;
+    margin-top: -80px;
+    padding-top: 92px;
+    background: linear-gradient(180deg, #1C3A78 0%, var(--night) 75%);
+}
+:root[data-bs-theme="dark"] .hero { background: linear-gradient(180deg, #0A1736 0%, #050B1F 75%); }
+.hero-portal { position: relative; z-index: 1; width: min(100% - 24px, 1160px); margin: 0 auto -110px; }
+.portal-frame {
+    position: relative;
+    aspect-ratio: 3 / 4.4;
+    overflow: hidden;
+    border-radius: 50% 50% 16px 16px / 36% 36% 16px 16px;
+    background: var(--gold);
+    outline: 1px solid rgba(224, 165, 38, 0.55);
+    outline-offset: 7px;
+    box-shadow: 0 30px 60px rgba(5, 11, 31, 0.4);
+    isolation: isolate;
+}
+.portal-frame { cursor: grab; touch-action: pan-y; user-select: none; }
+.portal-frame.is-orbiting { cursor: grabbing; }
+.portal-copy { transition: opacity 0.5s var(--ease-out); }
+.is-orbiting .portal-copy { opacity: 0.12; }
+.portal-scene { position: absolute; inset: 6px; overflow: hidden; border-radius: inherit; background: #8DB4E2; }
+.portal-scene canvas, .portal-photo { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center bottom; }
+.portal-photo { position: absolute; inset: 0; z-index: 1; transition: opacity 1.8s var(--ease-out), scale 1.8s var(--ease-out), filter 1.4s var(--ease-out); }
+.scene-live .portal-photo { opacity: 0; scale: 1.04; pointer-events: none; }
+.no-intro .portal-photo { transition: none; }
+/* intro-seen ставит theme.js в <head>: повторный заход — фото не показываем */
+.intro-seen .portal-photo { display: none; }
+:root[data-bs-theme="dark"] .portal-photo { filter: brightness(0.42) saturate(0.8); }
+.portal-copy { position: absolute; top: 15%; left: 50%; z-index: 1; width: min(88%, 680px); translate: -50% 0; }
+.portal-copy h1, .portal-copy .lead { color: var(--sky-text); transition: color 2.4s var(--ease-out); text-wrap: balance; }
+.portal-copy h1 span { color: var(--gold-dark); }
+:root[data-bs-theme="dark"] .portal-copy h1 span { color: var(--gold); }
+.tours { padding-top: 166px; min-height: 100vh; } /* не ниже экрана, чтобы прокрутке было куда доехать */
+@media (min-width: 768px) {
+    .portal-frame { aspect-ratio: 4 / 3; border-radius: 50% 50% 16px 16px / 62% 62% 16px 16px; }
+    .portal-copy { top: 11%; }
+    .hero-portal { margin-bottom: -150px; }
+    .tours { padding-top: 206px; }
+}
+@media (min-width: 1200px) {
+    .portal-frame { aspect-ratio: 16 / 10; border-radius: 50% 50% 16px 16px / 70% 70% 16px 16px; }
+    .portal-copy { top: 10%; }
+    .hero-portal { margin-bottom: -190px; }
+    .tours { padding-top: 246px; }
+}
+
+/* --- 7. Карточки: 3D-наклон за курсором (js/cards.js), вся карточка — ссылка --- */
+.card { --bs-card-bg: #fff; --bs-card-border-radius: 16px; --rx: 0deg; --ry: 0deg; cursor: pointer; transition: transform 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out); }
+:root[data-bs-theme="dark"] .card { --bs-card-bg: #111F45; }
+.card-img-top { height: auto; aspect-ratio: 4 / 3; object-fit: cover; }
+.badge { border-radius: 8px; }
+/* Клик по всей карточке ловит js/cards.js. «Влёт»: слой на весь экран, движения — в JS */
+.flight { position: fixed; inset: 0; z-index: 2000; overflow: hidden; background: var(--night); pointer-events: none; }
+.flight-photo { position: absolute; transform-origin: 0 0; }
+.flight-photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.flight-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11, 31, 75, 0.35) 0%, rgba(11, 31, 75, 0) 30%, rgba(11, 31, 75, 0) 45%, rgba(11, 31, 75, 0.9) 100%); }
+.flight-caption { position: absolute; left: 6vw; right: 6vw; bottom: 10vh; color: #fff; text-shadow: 0 2px 24px rgba(7, 20, 47, 0.5); }
+.flight-meta { display: block; color: var(--gold); font-size: 0.95rem; letter-spacing: 0.18em; text-transform: uppercase; }
+.flight-line { display: block; width: 72px; height: 2px; margin: 14px 0 18px; background: var(--gold); transform-origin: left; }
+/* overflow: hidden — невидимая кромка, из-под которой выезжает название */
+.flight-caption strong { display: block; overflow: hidden; padding-bottom: 0.08em; font-family: Georgia, serif; font-size: clamp(2.6rem, 7vw, 5.8rem); font-weight: normal; line-height: 1.05; }
+.flight-caption strong span { display: block; }
+.flight-veil { position: absolute; inset: 0; background: var(--night); opacity: 0; }   /* финал: растворение в синем */
+.card small { font-size: 0.8rem; }
+@media (hover: hover) {
+    .card:hover { transform: perspective(900px) translateY(-8px) rotateX(var(--rx)) rotateY(var(--ry)); box-shadow: 0 18px 40px rgba(11, 31, 75, 0.18); }
+    .card:hover { transition: transform 0.12s linear, box-shadow 0.25s var(--ease-out); }
+}
+
+/* --- 8. Анимации — только если в системе не включено «меньше движения» --- */
+@keyframes rise { from { opacity: 0; translate: 0 16px; } to { opacity: 1; translate: 0 0; } }
+@keyframes portal-in { from { opacity: 0; translate: 0 40px; scale: 0.96; } to { opacity: 1; translate: 0 0; scale: 1; } }
+@media (prefers-reduced-motion: no-preference) {
+    .hero-portal { animation: portal-in 1.1s var(--ease-out) backwards; }
+    .portal-copy h1, .portal-copy .lead, .portal-copy .btn { animation: rise 0.6s var(--ease-out) 0.35s backwards; }
+    .portal-copy .lead { animation-delay: 0.45s; }
+    .portal-copy .btn { animation-delay: 0.55s; }
+    @supports (animation-timeline: view()) {
+        .card { animation: rise 1ms var(--ease-out) backwards; animation-timeline: view(); animation-range: entry 5% entry 70%; }
+    }
+}
+
+/* «Меньше движения» в системе — выключаем переходы нашей темы */
+@media (prefers-reduced-motion: reduce) {
+    .theme-anim, .theme-anim *, .card, .navbar-dark .nav-link, .portal-copy, .icon-sun, .icon-moon { transition: none; }
+    .card:hover { transform: none; }
+}
+.theme-toggle { transition: scale 0.15s var(--ease-out); }
+.theme-toggle:active { scale: 0.9; }
+.card:focus-within { translate: 0 -6px; }
+
+/* Плавная прокрутка к якорю (кнопка «Choose a tour») + «прибытие» секции:
+   заголовок поднимается, карточки по очереди вспыхивают золотом.
+   Анимируем box-shadow и scale — их не трогает анимация появления карточек
+   (она на opacity/translate), поэтому не конфликтуют */
+@media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+    @keyframes tours-title { from { opacity: 0.2; translate: 0 18px; } to { opacity: 1; translate: 0 0; } }
+    /* Свечение: 0.5с разгорается, ~1.1с держится, 1.4с мягко гаснет (всего 3с).
+       Кривая у каждого отрезка своя: плавный вход, симметричный спад */
+    @keyframes tours-glow {
+        0%   { box-shadow: 0 0 0 0 rgba(224, 165, 38, 0); scale: 1;
+               animation-timing-function: var(--ease-out); }
+        17%  { box-shadow: 0 0 30px 2px rgba(224, 165, 38, 0.42); scale: 1.015;
+               animation-timing-function: linear; }
+        53%  { box-shadow: 0 0 30px 2px rgba(224, 165, 38, 0.42); scale: 1.015;
+               animation-timing-function: ease-in-out; }
+        100% { box-shadow: 0 0 0 0 rgba(224, 165, 38, 0); scale: 1; }
+    }
+    .is-arriving h2 { animation: tours-title 0.9s var(--ease-out) backwards; }
+    .is-arriving .card { animation: tours-glow 3s linear backwards; }
+    .is-arriving .card-grid > .card:nth-child(2),
+    .is-arriving .row > :nth-child(2) .card { animation-delay: 0.2s; }
+    .is-arriving .card-grid > .card:nth-child(3),
+    .is-arriving .row > :nth-child(3) .card { animation-delay: 0.4s; }
+}
+
+/* Якорь #tours не уезжает под фиксированную шапку (~80px) */
+html { scroll-padding-top: 80px; }

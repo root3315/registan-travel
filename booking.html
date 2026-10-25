@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book a tour — Registan Travel</title>
+    <meta name="description" content="Send a booking request and see the total price for your group straight away.">
+    <!-- Тот же самый файл стилей, что и у главной -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Тема подключается в head (до отрисовки), чтобы тёмная тема не «моргала» -->
+    <script src="js/theme.js"></script>
+</head>
+<body>
+
+    <!-- ===================== ШАПКА (как на главной) ===================== -->
+    <header class="site-header">
+        <div class="container">
+            <a class="logo" href="index.html">
+                <span class="logo-mark" aria-hidden="true"></span>
+                <span class="logo-word">Registan <span class="logo-accent">Travel</span></span>
+            </a>
+
+
+            <nav class="main-nav" aria-label="Main menu">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <!-- Здесь активна уже ссылка Booking -->
+                    <li><a class="active" href="booking.html" aria-current="page">Booking</a></li>
+                </ul>
+            </nav>
+
+            <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to night">
+                <svg class="theme-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <g class="icon-sun">
+                        <circle cx="12" cy="12" r="4"/>
+                        <path d="M12 2.8v2.1M12 19.1v2.1M2.8 12h2.1M19.1 12h2.1M5.5 5.5l1.5 1.5M17 17l1.5 1.5M5.5 18.5L7 17M17 7l1.5-1.5"/>
+                    </g>
+                    <path class="icon-moon" d="M19.5 14.6A7.6 7.6 0 0 1 9.4 4.5a7.6 7.6 0 1 0 10.1 10.1z"/>
+                </svg>
+            </button>
+
+            <a class="btn btn-gold header-cta" href="index.html#tours">Our tours</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- ===================== БАННЕР =====================
+             Фото галереи Хазрати Имам задано в CSS как фон -->
+        <section class="page-banner">
+            <div class="container">
+                <h1>Book your tour</h1>
+                <p>Send a request and we will email you within one working day. Nothing is charged online.</p>
+            </div>
+        </section>
+
+        <div class="container booking-layout">
+
+            <!-- ===================== ФОРМА =====================
+                 novalidate — отключаем встроенные подсказки браузера,
+                 проверку делаем сами в js/main.js -->
+            <section class="form-card" aria-label="Booking form">
+                <form id="booking-form" novalidate>
+
+                    <!-- Общее сообщение: красное (ошибка) или зелёное (успех).
+                         hidden — скрыто, пока JS его не покажет.
+                         role="alert" — скринридер зачитает текст сразу.
+                         tabindex="-1" — чтобы JS мог перевести на него фокус -->
+                    <div id="form-message" class="alert" role="alert" tabindex="-1" hidden></div>
+
+                    <!-- class="required" → звёздочка появится через CSS ::after.
+                         aria-describedby связывает поле с текстом его ошибки -->
+                    <div class="field">
+                        <label for="name" class="required">Full name</label>
+                        <input type="text" id="name" name="name" placeholder="e.g. Aziza Karimova"
+                               autocomplete="name" autocapitalize="words" aria-describedby="name-error">
+                        <p class="field-error" id="name-error"></p>
+                    </div>
+
+                    <div class="field">
+                        <label for="email" class="required">Email</label>
+                        <input type="email" id="email" name="email" placeholder="you@example.com"
+                               autocomplete="email" autocapitalize="off" spellcheck="false" aria-describedby="email-error">
+                        <p class="field-error" id="email-error"></p>
+                    </div>
+
+                    <!-- Цена тура хранится в data-price: JS берёт её оттуда,
+                         а не из текста опции — так надёжнее -->
+                    <div class="field">
+                        <label for="tour" class="required">Tour</label>
+                        <select id="tour" name="tour">
+                            <option value="tashkent" data-price="35">Old Tashkent Walk — 1 day</option>
+                            <option value="samarkand" data-price="120">Registan &amp; Gur-e-Amir — 2 days</option>
+                            <option value="khiva" data-price="210">Khiva Itchan Kala — 3 days</option>
+                        </select>
+                    </div>
+
+                    <div class="field-row">
+                        <div class="field">
+                            <label for="travellers" class="required">Travellers (1–12)</label>
+                            <input type="number" id="travellers" name="travellers" min="1" max="12" value="1"
+                                   aria-describedby="travellers-error">
+                            <p class="field-error" id="travellers-error"></p>
+                        </div>
+
+                        <div class="field">
+                            <label for="date" class="required">Date</label>
+                            <input type="date" id="date" name="date" aria-describedby="date-error">
+                            <p class="field-error" id="date-error"></p>
+                        </div>
+                    </div>
+
+                    <!-- Живая цена прямо над кнопкой отправки.
+                         aria-live="polite" — скринридер прочитает новую сумму -->
+                    <div class="price-box">
+                        <p class="price-label">Your total</p>
+                        <p class="price-total" id="price-total" aria-live="polite">Total: 1 × 35 USD = 35 USD</p>
+                        <p class="price-note" id="price-note">Groups of 5 or more get 10% off.</p>
+                    </div>
+
+                    <button type="submit" class="btn btn-block" id="submit-btn">Send booking request</button>
+                </form>
+            </section>
+
+            <!-- ===================== БОКОВАЯ КОЛОНКА ===================== -->
+            <aside class="info-card">
+                <h2>Good to know</h2>
+                <!-- маркеры-ромбы рисует CSS (li::before) -->
+                <ul class="info-list">
+                    <li>A licensed local guide on every tour</li>
+                    <li>Hotel pick-up anywhere in the city</li>
+                    <li>Pay on the day, in cash or by card</li>
+                    <li>Questions? <a class="tel" href="tel:+998710000000">+998 71 000 00 00</a></li>
+                </ul>
+                <p class="discount-tip"><strong>Group deal:</strong> 5 or more travellers get 10% off the whole booking.</p>
+            </aside>
+        </div>
+    </main>
+
+    <!-- ===================== ПОДВАЛ ===================== -->
+    <footer class="site-footer">
+        <div class="container">
+            <p class="footer-brand">
+                <span class="logo-mark" aria-hidden="true"></span>
+                <strong>Registan Travel</strong>
+            </p>
+            <p>Tashkent, Uzbekistan · <a class="tel" href="tel:+998710000000">+998 71 000 00 00</a></p>
+            <p>© 2026 Registan Travel. A fictional company for CSIT248 Lab 5.</p>
+            <p class="credits">Photo: Hazrati Imam complex, Tashkent — LBM1948, Wikimedia Commons (CC BY-SA 4.0).</p>
+        </div>
+    </footer>
+
+    <!-- Скрипт в конце body: к этому моменту вся форма уже есть в DOM -->
+    <script src="js/main.js"></script>
+</body>
+</html>
